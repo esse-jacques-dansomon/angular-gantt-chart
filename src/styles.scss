@@ -79,7 +79,7 @@ button:hover {
 
 #gantt-grid-container {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: auto 1fr;
   outline: 2px solid var(--outline-color);
 }
 
@@ -92,6 +92,9 @@ button:hover {
 #gantt-grid-container__time {
   display: grid;
   overflow-x: auto;
+  //grid-auto-flow: row;
+  //grid-auto-columns: minmax(30px, 1fr);
+
 }
 
 .gantt-task-row {
@@ -170,12 +173,28 @@ button:hover {
   position: absolute;
   height: 49px;
   z-index: 1;
-  background: linear-gradient(90deg, rgba(158,221,255,1) 0%, rgba(0,149,228,1) 100%);
+  //background: linear-gradient(90deg, rgba(158,221,255,1) 0%, rgba(0,149,228,1) 100%);
   border-radius: 5px;
   box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.05);
   cursor: move;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-overflow: ellipsis;
+  color: #EDEDED;
+
+  &span {
+
+  }
 }
 
+
+.gantt-time-period-day, .gantt-time-period-week {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .taskDuration:focus {
   outline: 1px solid black;
@@ -230,7 +249,6 @@ input[type=text], select {
 #add-forms-container button {
   color: white;
   background: #2ade3c;
-  font-size: 1.1rem;
   box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.05);
   padding: 0.5rem 1rem;
   border: 0;

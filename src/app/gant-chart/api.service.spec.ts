@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { GanttChartService } from './gantt-chart.service';
+import { ApiService } from './api.service';
 
 describe('GanttChartService', () => {
-  let service: GanttChartService;
+  let service: ApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(GanttChartService);
+    service = TestBed.inject(ApiService);
   });
 
   it('should be created', () => {

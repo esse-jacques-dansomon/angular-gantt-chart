@@ -1,7 +1,10 @@
-import {AfterContentInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {UtilsService} from "../utils.service";
 import {DatePipe, NgForOf, NgIf, NgStyle} from "@angular/common";
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {ApiService} from "../api.service";
+import {Developer} from "../../models";
+import {HttpClientModule} from "@angular/common/http";
 
 @Component({
   selector: 'app-gantt-chart',
@@ -11,7 +14,7 @@ import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
     DatePipe,
     ReactiveFormsModule,
     NgStyle,
-    NgIf
+    NgIf,
   ],
   templateUrl: './gantt-chart.component.html',
   styleUrl: './gantt-chart.component.scss'
@@ -33,67 +36,27 @@ export class GanttChartComponent {
     "Dec",
   ];
   monthsArray: Date[] = [];
-  years: number[] = Array.from({length: 29}, (_, index) => 2024 + index);
-  tasks = [
-    {
-      id: 1, name: "Esse Jacques", tasks: [
-        {
-          id: "1",
-          start: new Date("2024/1/2"),
-          end: new Date("2024/1/8"),
-          name: "Task 1",
-        },
-        {
-          id: "3",
-          start: new Date("2024/1/11"),
-          end: new Date("2024/1/18"),
-          name: "Task 3",
-        },
-      ]
-    },
-    {
-      id: 2, name: "User2", tasks: [
-        {
-          id: "4",
-          start: new Date("2024/1/5"),
-          end: new Date("2024/1/8"),
-          name: "Task 4",
-        },
-        {
-          id: "5",
-          start: new Date("2024/1/17"),
-          end: new Date("2024/1/20"),
-          name: "Task 5",
-        },
-      ]
-    },
-    {
-      id: 3, name: "User3", tasks: [
-
-        {
-          id: "9",
-          start: new Date("2024/1/11"),
-          end: new Date("2024/1/18"),
-          name: "Task 9",
-        },
-      ]
-    },
-
-  ];
+  years: number[] = Array.from({length: 29}, (_, index) => 2022 + index);
+  tasks: Developer[] = [];
 
   selectDateForm: FormGroup = new FormGroup({
-    fromSelectYear: new FormControl(2024),
-    fromSelectMonth: new FormControl(0),
+    fromSelectYear: new FormControl(2023),
+    fromSelectMonth: new FormControl(9),
     toSelectYear: new FormControl(2024),
-    toSelectMonth: new FormControl(11)
+    toSelectMonth: new FormControl(1)
   });
 
 
-  constructor(private utilsService: UtilsService) {
+  constructor(private utilsService: UtilsService, private apiService: ApiService) {
     this.generateMonthsArray(this.getStartMonth(), this.getNumMonth());
 
     this.selectDateForm.valueChanges.subscribe((value) => {
       this.generateMonthsArray(this.getStartMonth(), this.getNumMonth());
+    });
+
+    this.apiService.getDevelopers().subscribe((data) => {
+      this.tasks = data;
+      console.log(data)
     });
   }
 
@@ -149,11 +112,15 @@ export class GanttChartComponent {
     return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
   }
 
-  calcDurationWith(start: Date, end: Date) {
+  calcDurationWith(start: Date|any, end: Date|any) {
+    start = new Date(start);
+    end = new Date(end);
     return this.utilsService.dayDiff(start, end)  + "00%";
   }
 
-  isEqual(start: Date, fullYear: number, month: number, day: number) {
+  isEqual(start: Date|any, fullYear: number, month: number, day: number) {
+    console.log(start, fullYear, month, day)
+    start = new Date(start);
     return start.getFullYear() == fullYear && start.getMonth() == month && start.getDate() == day;
   }
 }
