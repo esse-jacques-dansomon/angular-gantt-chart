@@ -1,0 +1,164 @@
+<div #ganttChart>
+  <div id="gantt-container">
+
+    <div class="title">
+      <h1> Gantt Tracker</h1>
+    </div>
+
+    <div id="gantt-grid-container">
+      <div id="gantt-grid-container__tasks">
+        <!-- Optionally, you can use this for empty rows -->
+        <div *ngFor="let _ of [1, 2, 3]" class="gantt-task-row"></div>
+
+        <div *ngFor="let task of tasks" class="gantt-task-row">
+          <input [value]="task.name"/>
+<!--          <button (click)="deleteTask(task.id)">✕</button>-->
+        </div>
+
+
+<!--                <table class="gantt-task-table">-->
+<!--                  <tbody>-->
+<!--                  <tr class="gantt-task-row" *ngFor="let _ of [1, 2]" ></tr>-->
+<!--                  <tr class="gantt-task-row">-->
+<!--                    <th>ID</th>-->
+<!--                    <th>Name</th>-->
+<!--                    <th>User</th>-->
+<!--                    <th>Delay</th>-->
+<!--                  </tr>-->
+<!--                  <tr  *ngFor="let task of tasks" class="gantt-task-row">-->
+<!--                    <td>{{ task.id }}</td>-->
+<!--                    <td>{{ task.name }}</td>-->
+<!--                    <td>{{ task.name }}</td>-->
+<!--                    <td>{{ task.name }}</td>-->
+<!--                  </tr>-->
+<!--                  </tbody>-->
+<!--                </table>-->
+      </div>
+
+
+      <div id="gantt-grid-container__time" [style.grid-template-columns]="'repeat(' + getNumMonth() + ', 1fr)'">
+        <!--        //months-->
+        <div *ngFor="let month of monthsArray" class="gantt-time-period day">
+          <span>{{ month | date: 'MMM y' }}</span>
+        </div>
+        <!--Days of months-->
+        <div *ngFor="let month of monthsArray" class="gantt-time-period">
+          <div *ngFor="let day of generateArray(getDaysInMonth(month))">
+            <span>{{ day }}</span>
+          </div>
+        </div>
+        <!--days weeks of month-->
+        <div *ngFor="let month of monthsArray" class="gantt-time-period">
+          <div *ngFor="let day of generateArray(getDaysInMonth(month))">
+            <span>{{getDayOfWeek(month.getFullYear(), month.getMonth(), day - 1)}}</span>
+          </div>
+        </div>
+
+        <ng-container *ngFor="let task of tasks">
+          <!--        createTaskRowsTimePeriods-->
+          <div [style.grid-template-columns]="'repeat(' + getNumMonth() + ', 1fr)'"
+               class="gantt-time-period-cell-container ">
+
+            <div class="gantt-time-period"  *ngFor="let month of monthsArray">
+              <ng-container *ngFor="let day of generateArray(getDaysInMonth(month))">
+
+
+                <div class="gantt-time-period-cell"
+                     [ngStyle]="{ 'background-color': isWeekend(getDayOfWeek(month.getFullYear(), month.getMonth(), day - 1)) ? '#f1f1f1' : 'inherit' }"
+                     [attr.data-task]="task.id" [attr.data-date]="createFormattedDateFromStr(month.getFullYear(), month.getMonth() , day-1)"
+                >
+
+                  <ng-container *ngFor="let task of task.tasks">
+                    <div *ngIf="isEqual(task.start,month.getFullYear(), month.getMonth() , day)" class="taskDuration" [id]="task.id" [style.width]="calcDurationWith(task.start, task.end)">
+                      <span>{{task.name}}</span>
+                    </div>
+                  </ng-container>
+
+                </div>
+              </ng-container>
+
+            </div>
+          </div>
+        </ng-container>
+
+
+
+      </div>
+    </div>
+
+    <div id="add-forms-container">
+
+      <!--      <div class="inner-form-container">-->
+
+      <!--        <form id="add-task">-->
+      <!--          <h1>Add Task</h1>-->
+      <!--          <div><input placeholder="Add task name" type="text"></div>-->
+      <!--          <button type="submit">-->
+      <!--            Add-->
+      <!--          </button>-->
+      <!--        </form>-->
+
+
+      <!--        <form id="add-task-duration">-->
+      <!--          <h1>Add Task duration</h1>-->
+      <!--          <div class="inner-form-container">-->
+      <!--            <fieldset>-->
+      <!--              <label for="select-task">Which task?</label>-->
+      <!--              <select id="select-task" name="select-task"></select>-->
+      <!--            </fieldset>-->
+      <!--            <fieldset id="date">-->
+      <!--              <label for="start-date">Start date:</label>-->
+      <!--              <input type="date" id="start-date" name="start-date"-->
+      <!--                     value="2022-01-01"-->
+      <!--                     min="2022-01-01" max="2050-12-31"-->
+      <!--              >-->
+
+      <!--              <label for="end-date">End date:</label>-->
+      <!--              <input type="date" id="end-date" name="end-date"-->
+      <!--                     value="2022-01-03"-->
+      <!--                     min="2022-01-01" max="2050-12-31"-->
+      <!--              >-->
+      <!--            </fieldset>-->
+      <!--          </div>-->
+      <!--          <button>-->
+      <!--            Add-->
+      <!--          </button>-->
+      <!--        </form>-->
+
+      <!--      </div>-->
+
+      <div class="tracker-period">
+        <h1>Tracker Period</h1>
+        <form [formGroup]="selectDateForm">
+          <div id="settings">
+            <fieldset id="select-from">
+              <legend>From</legend>
+              <select formControlName="fromSelectMonth" id="from-select-month" name="from-select-month">
+                <option [value]="months.indexOf(month)" *ngFor="let month of months">{{month}}</option>
+              </select>
+              <select formControlName="fromSelectYear" id="from-select-year" name="from-select-year">
+                @for (year of years; track year) {
+                <option value="{{year}}">{{year}}</option>
+                }
+              </select>
+            </fieldset>
+
+            <fieldset id="select-to">
+              <legend>To</legend>
+              <select formControlName="toSelectMonth" id="to-select-month" name="to-select-month">
+                <option [value]="months.indexOf(month)" *ngFor="let month of months">{{month}}</option>
+              </select>
+              <select formControlName="toSelectYear" id="to-select-year" name="to-select-year">
+                @for (year of years; track year) {
+                <option value="{{year}}">{{year}}</option>
+                }
+              </select>
+            </fieldset>
+          </div>
+        </form>
+      </div>
+      <div>
+      </div>
+    </div>
+  </div>
+</div>
